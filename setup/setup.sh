@@ -1,45 +1,48 @@
 #!/bin/bash
 
-# Update the system
+# Update package manager
 sudo apt update
-sudo apt upgrade -y
 
-# Install Node.js
-curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash -
-sudo apt install -y nodejs
+# Install essential dependencies
+sudo apt install -y build-essential libssl-dev
 
-# Install MongoDB dependencies
-sudo apt install -y libcurl4 openssl
+# Install Node.js using Node Version Manager (nvm)
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
+source ~/.bashrc
+nvm install node
 
-# Download MongoDB package
-wget https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-ubuntu2004-5.0.3.tgz
-
-# Extract and install MongoDB
-tar -zxvf mongodb-linux-x86_64-ubuntu2004-5.0.3.tgz
-sudo mv mongodb-linux-x86_64-ubuntu2004-5.0.3/bin/* /usr/local/bin/
-rm -rf mongodb-linux-x86_64-ubuntu2004-5.0.3 mongodb-linux-x86_64-ubuntu2004-5.0.3.tgz
-
-# Create MongoDB data directory
-sudo mkdir -p /data/db
-
-# Start MongoDB service
-sudo mongod &
+# Install MongoDB
+wget -qO - https://www.mongodb.org/static/pgp/server-5.0.asc | sudo apt-key add -
+echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu $(lsb_release -sc)/mongodb-org/5.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-5.0.list
+sudo apt update
+sudo apt install -y mongodb-org
+sudo systemctl start mongod
+sudo systemctl enable mongod
 
 # Install Git
 sudo apt install -y git
 
-# Clone the project repository
-git clone <https://github.com/pjmj777/CafeManager>
+cd /home
+mkdir apps
+cd apps
 
-# Navigate to the project directory
-cd </home/apps/CafeManager>
+# Clone your MERN app repository (replace REPO_URL with your repository URL)
+git clone https://github.com/pjmj777/CafeManager/
 
-# Install project dependencies
+# Navigate to the app directory
+cd /home/apps/CafeManager
+
+# Install backend dependencies
+cd backend
 npm install
 
-# Build the project (if required)
+# Install frontend dependencies
+cd ../frontend
+npm install
+
+# Build the frontend
 npm run build
 
-# Start the project
+# Start the app
+cd ../backend
 npm start
-
